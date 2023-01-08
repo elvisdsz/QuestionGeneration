@@ -4,8 +4,8 @@
 # In[ ]:
 
 
-#pip install PyPDF2
-#pip install transformers
+#pip install PyPDF2==3.0.1
+#pip install transformers==4.25.1
 
 
 # In[25]:
