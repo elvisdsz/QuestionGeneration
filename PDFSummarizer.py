@@ -12,9 +12,10 @@
 
 
 import PyPDF2
+from tkinter.filedialog import askopenfilename
    
 # creating a pdf file object
-pdfFileObj = open('engproc-20-00016.pdf', 'rb')
+pdfFileObj = open(askopenfilename(filetypes=[("*","*.pdf")]), 'rb')
    
 # creating a pdf reader object
 pdfReader = PyPDF2.PdfReader(pdfFileObj)

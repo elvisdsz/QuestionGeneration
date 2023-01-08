@@ -223,7 +223,7 @@ def get_sentence_completions(filter_quotes_and_questions):
   ################################################
   # Driver Function 
   ################################################
-  def true_false_generation(text):
+def true_false_generation(text):
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model_BERT = SentenceTransformer('bert-base-nli-mean-tokens')
     model = GPT2LMHeadModel.from_pretrained("gpt2",pad_token_id=tokenizer.eos_token_id)
@@ -262,4 +262,8 @@ def get_sentence_completions(filter_quotes_and_questions):
         index = index+1  
     #   print ("\n\n")
     return res_complete
-  
+
+if __name__ == "__main__":
+  x = true_false_generation('''Stellantis revealed during CES 2023 its answer to an increasingly crowded battery-electric truck market: A broad-shouldered pickup loaded with tech, a longer cabin with third-row jump seats, cup holders in the frunk and even a movie projector.
+The Ram 1500 Revolution BEV concept isn’t exactly what the Stellantis brand plans to put into production by 2024. (That version will be shown later this year). Still, it provides the clearest picture yet of Ram’s plans for its next-generation of trucks and how it aims to compete with other entrants in the nascent EV truck market, including the Ford F-150 Lightning and the Chevrolet Silverado EV.''')
+  print(x)
