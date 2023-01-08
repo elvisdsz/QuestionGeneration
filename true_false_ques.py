@@ -22,7 +22,6 @@ from transformers import GPT2LMHeadModel, GPT2Tokenizer
 from sentence_transformers import SentenceTransformer
 from nltk import tokenize
 import scipy
-from IPython.display import Markdown, display
 torch.manual_seed(2020)
 
 nlp = spacy.load("en_core_web_sm")
@@ -50,12 +49,6 @@ def get_candidate_sents(resolved_text, ratio=0.3):
     # Remove very short sentences less than 30 characters and long sentences greater than 150 characters
     filtered_list_short_sentences = [sent for sent in candidate_sents_list if len(sent)>30 and len(sent)<150]
     return filtered_list_short_sentences
-
-def printmd(string):
-    display(Markdown(string))
-
-def printmd(string):
-    display(Markdown(string))
     
 def get_flattened(t):
     sent_str_final = None
@@ -167,9 +160,6 @@ def generate_sentences(partial_sentence,full_sentence, model, model_BERT, tokeni
     top_3_sentences = sort_by_similarity(full_sentence,generated_sentences, model_BERT)
     
     return top_3_sentences
-
-def printmd(string):
-    display(Markdown(string))
     
 def get_flattened(t):
     sent_str_final = None
@@ -257,7 +247,7 @@ def get_sentence_completions(filter_quotes_and_questions):
         partial_sentences = sent_completion_dict[key_sentence]
         false_sentences =[]
         #print_string = "**%s) True Sentence (from the story) :**"%(str(index))
-        #printmd(print_string)
+        #print(print_string)
         #print ("  ",key_sentence)
         res_individual.append(str(key_sentence))
         for partial_sent in partial_sentences:
@@ -265,10 +255,10 @@ def get_sentence_completions(filter_quotes_and_questions):
             false_sentences.extend(false_sents)
         res_individual.extend(false_sents)
         res_complete.append(res_individual)
-    #    printmd("  **False Sentences (GPT-2 Generated)**")
+    #    print("  **False Sentences (GPT-2 Generated)**")
     #    for ind,false_sent in enumerate(false_sentences):
     #        print_string_choices = "**%s** %s"%(choice_list[ind],false_sent)
-    #        printmd(print_string_choices)
+    #        print(print_string_choices)
         index = index+1  
     #   print ("\n\n")
     return res_complete
