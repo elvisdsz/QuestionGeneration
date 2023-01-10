@@ -24,6 +24,9 @@ from nltk import tokenize
 import scipy
 torch.manual_seed(2020)
 
+from spacy.cli import download
+download("en_core_web_sm")
+
 nlp = spacy.load("en_core_web_sm")
 nltk.download('punkt')
 benepar.download('benepar_en3')
