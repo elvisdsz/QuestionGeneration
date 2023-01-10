@@ -26,8 +26,8 @@
 		<tbody>
 			{% for record in prediction %}
 			<tr>
-				{% for col in colnames %}
-				<td>{{ record[col] }}</td>
+				{% for r in record %}
+				<td>{{ r }}</td>
 				{% endfor %}
 			</tr>
 			{% endfor %}

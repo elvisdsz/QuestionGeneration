@@ -95,7 +95,7 @@ def get_key_words(context, module_type = 't'):
  
 if __name__ == "__main__":
   # test
-  txt = 'Mauricio Pochettino open to leaving Paris St-Germain if Man Utd make approach'
+  txt = 'Tim Berners-Lee, a British scientist, invented the World Wide Web (WWW) in 1989, while working at CERN. The web was originally conceived and developed to meet the demand for automated information-sharing between scientists in universities and institutes around the world.'
   for ans, context in get_key_words(txt, 'st'):
     print('=======================================')
     print()
