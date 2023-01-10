@@ -2,16 +2,14 @@ import os
 import speech_recognition as sr
 from tkinter.filedialog import askopenfilename
 
-def convertToMP3(filename):
+def transcribe_video(filename):
    command = "ffmpeg -i "+filename+".mp4 "+filename+".mp3"
    os.system(command)
 
-def convertToWAV(filename):
    commandwav = "ffmpeg -i "+filename+".mp3 "+filename+".wav"
    os.system(commandwav)
 
-def audioToText(filename):
-   AUDIO_FILE = "video.wav"
+   AUDIO_FILE = filename+".wav"
    r = sr.Recognizer()
    audioFile = sr.AudioFile(AUDIO_FILE)
 
@@ -22,12 +20,12 @@ def audioToText(filename):
    print("------------------------------------")
    text = r.recognize_google(audio)
    #text = r.recognize_sphinx(audio)
-   print(text)
+   return(text)
 
-   
-filename = askopenfilename(filetypes=[("*","*.mp4")]) # queryImage
-temp = os.path.splitext(filename)
-convertToMP3(temp[0])
-convertToWAV(temp[0])
-audioToText(temp[0])
 
+
+if __name__ == "__main__":
+   filename = askopenfilename(filetypes=[("*","*.mp4")]) # queryImage
+   temp = os.path.splitext(filename)
+   text = transcribe_video(temp[0])
+   #print(text)
