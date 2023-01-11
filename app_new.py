@@ -166,8 +166,7 @@ def get_embedding(doc):
 
     bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     bert_model = BertModel.from_pretrained("bert-base-uncased")
-  
-  # txt = '[CLS] ' + doc + ' [SEP]'
+
     tokens = bert_tokenizer.tokenize(txt)
     token_idx = bert_tokenizer.convert_tokens_to_ids(tokens)
     segment_ids = [1] * len(tokens)
@@ -199,16 +198,16 @@ def get_key_words(context, module_type = 't'):
     for txt in get_sent(context):
         keywd = get_vector(str(txt))
         print(f'vectors : {keywd}')
-    if module_type == 't':
-        doc_embedding = get_embedding(str(txt))
-        keywd_embedding = get_embedding(' '.join(keywd))
-    else:
-        doc_embedding = modelDB.encode([str(txt)])
-        keywd_embedding = modelDB.encode(keywd)
-    
-    distances = cosine_similarity(doc_embedding, keywd_embedding)
-    print(distances)
-    keywords += [(keywd[index], str(txt)) for index in distances.argsort()[0][-top_n:]]
+        if module_type == 't':
+            doc_embedding = get_embedding(str(txt))
+            keywd_embedding = get_embedding(' '.join(keywd))
+        else:
+            doc_embedding = modelDB.encode([str(txt)])
+            keywd_embedding = modelDB.encode(keywd)
+        
+        distances = cosine_similarity(doc_embedding, keywd_embedding)
+        print(distances)
+        keywords += [(keywd[index], str(txt)) for index in distances.argsort()[0][-top_n:]]
 
     return keywords
 
@@ -523,6 +522,20 @@ def true_false_generation(text):
         index = index+1  
     #   print ("\n\n")
     return res_complete
+
+
+def get_questions(text):
+    print() #todo
+
+def get_questions_video(videoFilepath):
+    print() #todo
+
+def get_questions_audio(audioFilepath):
+    print() #todo
+
+def get_questions_pdf(pdfFilepath):
+    print() #todo
+
 
 
 if __name__ == '__main__':
