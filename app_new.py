@@ -112,16 +112,16 @@ def predict():
             print(output)
             summ = summ + output
 
-            qas = generate_ques(summ)
+        qas = generate_ques(summ)
 
-            mcq = []
+        mcq = []
 
-            for ques_ans in qas:
-                distractors = generate_distractors(ques_ans[1])
-                mcq.append((ques_ans[0], ques_ans[1], distractors))
+        for ques_ans in qas:
+            distractors = generate_distractors(ques_ans[1])
+            mcq.append((ques_ans[0], ques_ans[1], distractors))
 
-            colname = ['Question', 'Answer', 'Distractors']
-            return render_template('result.html', prediction=mcq, colnames=colname, summary=summ)        
+        colname = ['Question', 'Answer', 'Distractors']
+        return render_template('result.html', prediction=mcq, colnames=colname, summary=summ)        
             
 
     
