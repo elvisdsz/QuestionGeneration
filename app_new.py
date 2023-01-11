@@ -75,10 +75,10 @@ def predict():
     if request.method == 'POST':
         myfile = request.form['myfile']
         
-        articles = get_ques_pdf(myfile)
+        articles = get_text_pdf(myfile)
 
         summ = ""
-        for article in ARTICLE:
+        for article in articles:
             print("**************")
             # encode the text into tensor of integers using the tokenizer
             inputs = tokenizerT5.encode(article, return_tensors="pt", max_length=512, padding="max_length", truncation=True)
@@ -238,6 +238,8 @@ def generate_distractors(originalword):
 
     #print ("word ",word)
     sense = s2v.get_best_sense(word)
+    if sense is None:
+        return []
     #print ("Best sense ", sense)
     most_similar = s2v.most_similar(sense, n=20)
     #print (most_similar)
@@ -498,9 +500,24 @@ def true_false_generation(text):
     #   print ("\n\n")
     return res_complete
 
+def get_questions(textList):
+    summ = ""
+    for text in textList:
+        print("**************")
+        # encode the text into tensor of integers using the tokenizer
+        inputs = tokenizerT5.encode(text, return_tensors="pt", max_length=512, padding="max_length", truncation=True)
+        summary_ids = modelT5.generate(inputs,num_beams=int(2),no_repeat_ngram_size=3,length_penalty=2.0,min_length=100,max_length=200,early_stopping=True)
+        output = tokenizerT5.decode(summary_ids[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
+        print(output)
+        summ = summ + output
 
-def get_questions(text):
-    print() #todo
+    qas = generate_ques(summ)
+    mcq = []
+    for ques_ans in qas:
+        distractors = generate_distractors(ques_ans[1])
+        mcq.append((ques_ans[0], ques_ans[1], distractors))
+
+    return mcq
 
 def get_questions_video(videoFilepath):
     text = []
@@ -522,8 +539,8 @@ def get_questions_video(videoFilepath):
     print("------------------------------------")
     text.append(r.recognize_google(audio))
     #text = r.recognize_sphinx(audio)
-    print(text)
-    return(text)
+    #print(text)
+    return get_questions(text)
 
 def get_questions_audio(audioFilepath):
     text = []
@@ -543,10 +560,10 @@ def get_questions_audio(audioFilepath):
     print("------------------------------------")
     text.append(r.recognize_google(audio))
     #text = r.recognize_sphinx(audio)
-    print(text)
-    return(text)
+    #print(text)
+    return get_questions(text)
 
-def get_ques_pdf(myfile):
+def get_text_pdf(myfile):
     pdfFileObj = open(myfile, 'rb')
     
     pdfReader = PyPDF2.PdfReader(pdfFileObj)
@@ -557,6 +574,10 @@ def get_ques_pdf(myfile):
         print(len(articles))
     pdfFileObj.close()
     return articles
+
+def get_questions_pdf(pdfFilepath):
+    return get_questions(get_text_pdf(pdfFilepath))
+
 
 if __name__ == '__main__':
     app.run()
