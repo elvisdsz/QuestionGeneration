@@ -528,10 +528,48 @@ def get_questions(text):
     print() #todo
 
 def get_questions_video(videoFilepath):
-    print() #todo
+    text = []
+    temp = os.path.splitext(videoFilepath)
+    command = "ffmpeg -i "+temp[0]+".mp4 "+temp[0]+".mp3"
+    os.system(command)
+
+    commandwav = "ffmpeg -i "+temp[0]+".mp3 "+temp[0]+".wav"
+    os.system(commandwav)
+
+    AUDIO_FILE = temp[0]+".wav"
+    r = sr.Recognizer()
+    audioFile = sr.AudioFile(AUDIO_FILE)
+
+    with audioFile as source:
+       audio = r.record(source, duration=100)
+
+    print(type(audio))
+    print("------------------------------------")
+    text.append(r.recognize_google(audio))
+    #text = r.recognize_sphinx(audio)
+    print(text)
+    return(text)
 
 def get_questions_audio(audioFilepath):
-    print() #todo
+    text = []
+    temp = os.path.splitext(audioFilepath)
+   
+    commandwav = "ffmpeg -i "+temp[0]+".mp3 "+temp[0]+".wav"
+    os.system(commandwav)
+
+    AUDIO_FILE = temp[0]+".wav"
+    r = sr.Recognizer()
+    audioFile = sr.AudioFile(AUDIO_FILE)
+
+    with audioFile as source:
+        audio = r.record(source, duration=100)
+
+    print(type(audio))
+    print("------------------------------------")
+    text.append(r.recognize_google(audio))
+    #text = r.recognize_sphinx(audio)
+    print(text)
+    return(text)
 
 def get_questions_pdf(pdfFilepath):
     print() #todo
