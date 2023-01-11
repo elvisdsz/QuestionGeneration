@@ -74,33 +74,8 @@ def predict():
     json_result = []
     if request.method == 'POST':
         myfile = request.form['myfile']
-        print("myfile *** " + myfile)
-        print("****************ARTICLE*********************")
-        # creating a pdf file object
-        #pdfFileObj = open(askopenfilename(filetypes=[("*","*.pdf")]), 'rb')
-        pdfFileObj = open(myfile, 'rb')
         
-        # creating a pdf reader object
-        pdfReader = PyPDF2.PdfReader(pdfFileObj)
-        
-        # printing number of pages in pdf file
-        ARTICLE = []
-        str=""
-        print(len(pdfReader.pages))
-        for i in range(len(pdfReader.pages)): 
-            # creating a page object
-            pageObj = pdfReader.pages[i]
-
-            # extracting text from page
-            ARTICLE.append(pageObj.extract_text().replace('\n', ' '))
-            
-        print(len(ARTICLE))
-
-        
-        # closing the pdf file object
-        pdfFileObj.close()
-        
-        print("*****************summary_text********************")
+        articles = get_ques_pdf(myfile)
 
         summ = ""
         for article in ARTICLE:
@@ -571,10 +546,17 @@ def get_questions_audio(audioFilepath):
     print(text)
     return(text)
 
-def get_questions_pdf(pdfFilepath):
-    print() #todo
-
-
+def get_ques_pdf(myfile):
+    pdfFileObj = open(myfile, 'rb')
+    
+    pdfReader = PyPDF2.PdfReader(pdfFileObj)
+    articles = []
+    for i in range(len(pdfReader.pages)): 
+        pageObj = pdfReader.pages[i]
+        articles.append(pageObj.extract_text().replace('\n', ' '))
+        print(len(articles))
+    pdfFileObj.close()
+    return articles
 
 if __name__ == '__main__':
     app.run()
