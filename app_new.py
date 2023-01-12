@@ -505,8 +505,9 @@ def get_questions(textList):
     for text in textList:
         print("**************")
         # encode the text into tensor of integers using the tokenizer
-        inputs = tokenizerT5.encode(text, return_tensors="pt", max_length=512, padding="max_length", truncation=True)
-        summary_ids = modelT5.generate(inputs,num_beams=int(2),no_repeat_ngram_size=3,length_penalty=2.0,min_length=100,max_length=200,early_stopping=True)
+        t5_prepared_Text = "summarize: "+ text
+        inputs = tokenizerT5.encode(t5_prepared_Text, return_tensors="pt", max_length=512, padding="max_length", truncation=True)
+        summary_ids = modelT5.generate(inputs,num_beams=int(4),no_repeat_ngram_size=2,length_penalty=2.0,min_length=100,max_length=200,early_stopping=True)
         output = tokenizerT5.decode(summary_ids[0], skip_special_tokens=True, clean_up_tokenization_spaces=True)
         print(output)
         summ = summ + output
@@ -515,6 +516,9 @@ def get_questions(textList):
     mcq = []
     for ques_ans in qas:
         distractors = generate_distractors(ques_ans[1])
+        distractors = distractors[0:3:1]
+        distractors.append(ques_ans[1])
+        shuffle(distractors)
         mcq.append((ques_ans[0], ques_ans[1], distractors))
 
     return mcq
@@ -578,6 +582,36 @@ def get_text_pdf(myfile):
 def get_questions_pdf(pdfFilepath):
     return get_questions(get_text_pdf(pdfFilepath))
 
+from werkzeug.utils import secure_filename
+
+@app.route('/mcq', methods = ['GET','POST'])
+def mcq_gen():
+    filename = None
+    mcq = None
+    if request.method == 'POST':
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        filepath = os.path.join('tempFiles', filename)
+        file.save(filepath)
+        filepath = os.path.abspath(filepath) # absolute
+        filetype = request.form.get('filetype')
+        print("filetype -- ", filetype)
+        mcq = []
+        if filetype == "pdf":
+            mcq = get_questions_pdf(filepath)
+        elif filetype == "video":
+            mcq = get_questions_video(filepath)
+        elif filetype == "audio":
+            mcq = get_questions_audio(filepath)
+        print(mcq)
+    
+    return render_template("mcq.html", name = filename, mcq = mcq)
+
+@app.route('/mcq2', methods = ['GET','POST'])
+def mcq_gen2():
+    print("method -- ", request.method)
+    print("type -- ", request.args.get('filetype'))
+    return "ok"
 
 if __name__ == '__main__':
     app.run()
