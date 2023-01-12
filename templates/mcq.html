@@ -112,7 +112,6 @@
 			//document.getElementById("result").innerHTML = "";
 			//var pred = document.querySelector('#demo').value;
 			var pred = JSON.parse('{{ mcq | tojson }}')
-            pred = pred.replace(/""/g, '"');
 			console.log(pred, pred.length)
 			var arr = [], selected = [], correctName = [], correctValue = [];
 
