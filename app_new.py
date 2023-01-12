@@ -142,7 +142,7 @@ def get_embedding(doc):
     bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     bert_model = BertModel.from_pretrained("bert-base-uncased")
 
-    tokens = bert_tokenizer.tokenize(txt)
+    tokens = bert_tokenizer.tokenize(doc)
     token_idx = bert_tokenizer.convert_tokens_to_ids(tokens)
     segment_ids = [1] * len(tokens)
 
@@ -254,7 +254,7 @@ def generate_distractors(originalword):
     distractors.insert(0,originalword)
     # print (distractors)
     answer_embedd, distractor_embedds = get_answer_and_distractor_embeddings(originalword,distractors)
-    final_distractors = mmr(answer_embedd,distractor_embedds, distractors,5, 0.5)
+    final_distractors = mmr(answer_embedd,distractor_embedds, distractors,5, 0.6)
     filtered_distractors = []
     for dist in final_distractors:
         filtered_distractors.append (dist[0])

@@ -11,16 +11,17 @@
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
-	.container {
+    body {
+        background-color: #555;
+    }
+
+	.container-fluid {
 		background-color: #555;
 		color: #ddd;
-		display: table-cell;
-		padding: 20px;
 		font-family: 'Montserrat', sans-serif;
-		max-width: 700px;
 	}
 
-	.container>p {
+	.container-fluid>p {
 		font-size: 32px;
 	}
 
@@ -111,6 +112,7 @@
 			//document.getElementById("result").innerHTML = "";
 			//var pred = document.querySelector('#demo').value;
 			var pred = JSON.parse('{{ mcq | tojson }}')
+            pred = pred.replace(/""/g, '"');
 			console.log(pred, pred.length)
 			var arr = [], selected = [], correctName = [], correctValue = [];
 
@@ -170,9 +172,11 @@
         <h1 style="font-size: 35px;
         font-family: serif;"><b>Automatic Question Generator</b></h1>
     </div>
-    <div>
+
+    {% if mcq is none %}
+    <div class="container container-fluid">
         <form action = "/mcq" method = "post" enctype="multipart/form-data" style="display:flex">
-            <div>
+            <div style="padding: 0 10% 0 0;">
                 <input type="radio" id="pdf" name="filetype" value="pdf">
                 <label for="pdf">PDF</label><br>
                 <input type="radio" id="video" name="filetype" value="video">
@@ -184,15 +188,17 @@
             <input type = "submit" class="btn btn-default btn-md" style="border-radius: 0px;background-color: #353232;color: white;font-family: auto;" value="Upload">  
        </form>
     </div>
+    {% endif %}
 
     {%if mcq %}
-    <div style="padding:20px">
-        <div class="container">
+    <div>
+        <div class="container container-fluid" style="padding:0 10%">
+            <p>Generated {{mcq|length}} questions from source</p>
+            <hr/>
             {% set count = namespace(value=0) %}
             {% for record in mcq %}
-            <br><br>
+            <br>
             <div class="question ml-sm-5 pl-sm-5 pt-2">
-
                 <div>
                     <div class="py-2 h5"><b id="question{{count.value}}">Q. {{ record[0] }}</b></div>
                     {% for op in record[2] %}
@@ -201,36 +207,28 @@
                         <span class="checkmark"></span>
                     </label>
                     {% endfor %}
-
                 </div>
-
             </div>
+            <hr />
             {% set count.value = count.value + 1 %}
             {% endfor %}
+
+            <hr/>
+            <div style="padding: 20px;">
+                <input type="submit" class="btn btn-default btn-lg"
+                    style="border-radius: 0px;background-color: #353232;color: white;font-family: auto;" value="Submit"
+                    onclick="evaluateMCQ()" />
+        
+                <div id="sc" style="background-color: #555;font-size: large; width: fit-content;color: white;padding: 5px;"></div>
+        
+            </div>
+
         </div>
     </div>
-    {% endif %}
+
+    <input type="text" id="demo" value='{{mcq|tojson}}' style="visibility: hidden;" />
+
     
-    <input type="text" id="demo" value="{{mcq|tojson}}" style="visibility: hidden;" />
-
-    <div style="padding: 20px;">
-        <input type="submit" class="btn btn-default btn-lg"
-            style="border-radius: 0px;background-color: #353232;color: white;font-family: auto;" value="Submit"
-            onclick="evaluateMCQ()" />
-
-        <div id="sc" style="background-color: #555;font-size: large; width: fit-content;color: white;padding: 5px;"></div>
-
-    </div>
-
-
-
-    {%if name %}
-        <p>File Uploaded successfully!</p>
     {% endif %}
-    <div>
-        {%if mcq %}
-            {{ mcq }}
-        {% endif %}
-    </div>
 </body>
 </html>
