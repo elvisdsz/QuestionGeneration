@@ -563,9 +563,9 @@ import json
 def mcq_gen():
     filename = None
     mcq = None
-    if 1==1:
-        mcq = json.loads("[[\"What type of systems does this paper compare the web with?\", \"contemporary\", [\"modern\", \"modernist\", \"contemporary\", \"contemporaries\"]], [\"What type of model does this paper describe?\", \"data\", [\"only data\", \"more data\", \"data\", \"relevant data\"]], [\"What type of data does this paper describe?\", \"model\", [\"most models\", \"actual model\", \"models\", \"model\"]], [\"Along with the aims and data model, what is needed to implement the web?\", \"protocols\", [\"network protocols\", \"protocols\", \"routing protocols\", \"new protocols\"]], [\"What does this paper describe the aims, data model, and protocols needed to implement?\", \"web\", [\"web services\", \"web\", \"websites\", \"Web\"]]]")
-        return render_template("mcq.html", name = "abc.pdf", mcq = mcq)
+    #if 1==1:
+    #    mcq = json.loads("[[\"What type of systems does this paper compare the web with?\", \"contemporary\", [\"modern\", \"modernist\", \"contemporary\", \"contemporaries\"]], [\"What type of model does this paper describe?\", \"data\", [\"only data\", \"more data\", \"data\", \"relevant data\"]], [\"What type of data does this paper describe?\", \"model\", [\"most models\", \"actual model\", \"models\", \"model\"]], [\"Along with the aims and data model, what is needed to implement the web?\", \"protocols\", [\"network protocols\", \"protocols\", \"routing protocols\", \"new protocols\"]], [\"What does this paper describe the aims, data model, and protocols needed to implement?\", \"web\", [\"web services\", \"web\", \"websites\", \"Web\"]]]")
+    #    return render_template("mcq.html", name = "abc.pdf", mcq = mcq)
     if request.method == 'POST':
         file = request.files['file']
         filename = secure_filename(file.filename)
