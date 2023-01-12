@@ -2,7 +2,7 @@
 import os
 os.environ['TRANSFORMERS_CACHE'] = 'D:\\temp\\models'
 
-from flask import Flask, render_template,request
+from flask import Flask, render_template,request, redirect
 import PyPDF2
 import speech_recognition as sr
 #from tkinter.filedialog import askopenfilename
@@ -67,7 +67,8 @@ modelL12= SentenceTransformer('all-MiniLM-L12-v2')
 app = Flask(__name__)
 @app.route('/')
 def home():
-    return render_template('home.html')
+    #return render_template('home.html')
+    return redirect('/login')
 
 @app.route('/predict', methods = ['POST'])
 def predict():
@@ -556,11 +557,15 @@ def get_questions_pdf(pdfFilepath):
     return get_questions(get_text_pdf(pdfFilepath))
 
 from werkzeug.utils import secure_filename
+import json
 
 @app.route('/mcq', methods = ['GET','POST'])
 def mcq_gen():
     filename = None
     mcq = None
+    if 1==1:
+        mcq = json.loads("[[\"What type of systems does this paper compare the web with?\", \"contemporary\", [\"modern\", \"modernist\", \"contemporary\", \"contemporaries\"]], [\"What type of model does this paper describe?\", \"data\", [\"only data\", \"more data\", \"data\", \"relevant data\"]], [\"What type of data does this paper describe?\", \"model\", [\"most models\", \"actual model\", \"models\", \"model\"]], [\"Along with the aims and data model, what is needed to implement the web?\", \"protocols\", [\"network protocols\", \"protocols\", \"routing protocols\", \"new protocols\"]], [\"What does this paper describe the aims, data model, and protocols needed to implement?\", \"web\", [\"web services\", \"web\", \"websites\", \"Web\"]]]")
+        return render_template("mcq.html", name = "abc.pdf", mcq = mcq)
     if request.method == 'POST':
         file = request.files['file']
         filename = secure_filename(file.filename)
@@ -580,11 +585,9 @@ def mcq_gen():
     
     return render_template("mcq.html", name = filename, mcq = mcq)
 
-@app.route('/mcq2', methods = ['GET','POST'])
-def mcq_gen2():
-    print("method -- ", request.method)
-    print("type -- ", request.args.get('filetype'))
-    return "ok"
+@app.route('/login', methods = ['GET','POST'])
+def login():
+    return render_template("/login.html")
 
 if __name__ == '__main__':
     app.run()
