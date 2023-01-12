@@ -45,10 +45,10 @@ def preprocess(sentences):
     return output
 
 def get_candidate_sents(resolved_text, ratio=0.3):
-    candidate_sents = summarize(resolved_text, ratio=ratio)
-    candidate_sents_list = tokenize.sent_tokenize(candidate_sents)
-    #candidate_sents_list = tokenize.sent_tokenize(resolved_text)
-    #candidate_sents_list = [re.split(r'[:;]+',x)[0] for x in candidate_sents_list ]
+    #candidate_sents = summarize(resolved_text, ratio=ratio)
+    #candidate_sents_list = tokenize.sent_tokenize(candidate_sents)
+    candidate_sents_list = tokenize.sent_tokenize(resolved_text)
+    candidate_sents_list = [re.split(r'[:;]+',x)[0] for x in candidate_sents_list ]
     # Remove very short sentences less than 30 characters and long sentences greater than 150 characters
     filtered_list_short_sentences = [sent for sent in candidate_sents_list if len(sent)>30 and len(sent)<150]
     return filtered_list_short_sentences
@@ -230,7 +230,10 @@ def true_false_generation(text):
     tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model_BERT = SentenceTransformer('bert-base-nli-mean-tokens')
     model = GPT2LMHeadModel.from_pretrained("gpt2",pad_token_id=tokenizer.eos_token_id)
-
+    
+    text = text.replace('\n','')
+    text = text.replace('\t',' ')
+    
     # print(text)
     cand_sents = get_candidate_sents(text)
     # print(cand_sents)
@@ -267,6 +270,6 @@ def true_false_generation(text):
     return res_complete
 
 if __name__ == "__main__":
-  x = true_false_generation('''Stellantis revealed during CES 2023 its answer to an increasingly crowded battery-electric truck market: A broad-shouldered pickup loaded with tech, a longer cabin with third-row jump seats, cup holders in the frunk and even a movie projector.
+    x = true_false_generation('''Stellantis revealed during CES 2023 its answer to an increasingly crowded battery-electric truck market: A broad-shouldered pickup loaded with tech, a longer cabin with third-row jump seats, cup holders in the frunk and even a movie projector.
 The Ram 1500 Revolution BEV concept isn’t exactly what the Stellantis brand plans to put into production by 2024. (That version will be shown later this year). Still, it provides the clearest picture yet of Ram’s plans for its next-generation of trucks and how it aims to compete with other entrants in the nascent EV truck market, including the Ford F-150 Lightning and the Chevrolet Silverado EV.''')
-  print(x)
+    print(x)
