@@ -266,34 +266,31 @@ def generate_distractors(originalword):
 
 #*********Boolean Ques/Ans********#
 
-def preprocess(sentences):
+def preprocess_cand_sents(sentences):
     output = []
     for sent in sentences:
-        single_quotes_present = len(re.findall(r"['][\w\s.:;,!?\\-]+[']",sent))>0
-        double_quotes_present = len(re.findall(r'["][\w\s.:;,!?\\-]+["]',sent))>0
+        single_quotes = len(re.findall(r"['][\w\s.:;,!?\\-]+[']",sent))>0
+        double_quotes = len(re.findall(r'["][\w\s.:;,!?\\-]+["]',sent))>0
         question_present = "?" in sent
-        if single_quotes_present or double_quotes_present or question_present :
+        if single_quotes or double_quotes or question_present :
             continue
         else:
             output.append(sent.strip(punctuation))
     return output
 
-def get_candidate_sents(resolved_text, ratio=0.3):
-    candidate_sents = summarize(resolved_text, ratio=ratio)
-    candidate_sents_list = tokenize.sent_tokenize(candidate_sents)
-    #candidate_sents_list = tokenize.sent_tokenize(resolved_text)
-    #candidate_sents_list = [re.split(r'[:;]+',x)[0] for x in candidate_sents_list ]
-    # Remove very short sentences less than 30 characters and long sentences greater than 150 characters
-    filtered_list_short_sentences = [sent for sent in candidate_sents_list if len(sent)>30 and len(sent)<150]
-    return filtered_list_short_sentences
+def generate_candidate_sents(text):
+    cand_sents = tokenize.sent_tokenize(text)
+    cand_sents = [re.split(r'[:;]+',x)[0] for x in cand_sents ]
+    short_sentences = [sent for sent in cand_sents if len(sent)>30 and len(sent)<150]
+    return short_sentences
     
-def get_flattened(t):
-    sent_str_final = None
+def flatten_sents(t):
+    sent_final = None
     if t is not None:
         sent_str = [" ".join(x.leaves()) for x in list(t)]
-        sent_str_final = [" ".join(sent_str)]
-        sent_str_final = sent_str_final[0]
-    return sent_str_final
+        sent_final = [" ".join(sent_str)]
+        sent_final = sent_final[0]
+    return sent_final
     
 
 def get_termination_portion(main_string,sub_string):
@@ -309,9 +306,12 @@ def get_termination_portion(main_string,sub_string):
                      
     return None
     
+####
+## ramsrigouthamg, Generate_True_or_False_OpenAI_GPT2_Sentence_BERT, (2020), GitHub repository, https://github.com/ramsrigouthamg/Generate_True_or_False_OpenAI_GPT2_Sentence_BERT
+####
 def get_right_most_VP_or_NP(parse_tree,last_NP = None,last_VP = None):
     if len(parse_tree.leaves()) == 1:
-        return get_flattened(last_NP),get_flattened(last_VP)
+        return flatten_sents(last_NP),flatten_sents(last_VP)
     last_subtree = parse_tree[-1]
     if last_subtree.label() == "NP":
         last_NP = last_subtree
@@ -321,6 +321,9 @@ def get_right_most_VP_or_NP(parse_tree,last_NP = None,last_VP = None):
     return get_right_most_VP_or_NP(last_subtree,last_NP,last_VP)
 
 
+####
+## ramsrigouthamg, Generate_True_or_False_OpenAI_GPT2_Sentence_BERT, (2020), GitHub repository, https://github.com/ramsrigouthamg/Generate_True_or_False_OpenAI_GPT2_Sentence_BERT
+####
 def get_sentence_completions(filter_quotes_and_questions):
     sentence_completion_dict = {}
     for individual_sentence in filter_quotes_and_questions:
@@ -346,6 +349,9 @@ def get_sentence_completions(filter_quotes_and_questions):
             sentence_completion_dict[sentence]=longest_phrase
     return sentence_completion_dict
 
+####
+## ramsrigouthamg, Generate_True_or_False_OpenAI_GPT2_Sentence_BERT, (2020), GitHub repository, https://github.com/ramsrigouthamg/Generate_True_or_False_OpenAI_GPT2_Sentence_BERT
+####
 def sort_by_similarity(original_sentence,generated_sentences_list, model_BERT):
     # Each sentence is encoded as a 1-D vector with 768 columns
     sentence_embeddings = model_BERT.encode(generated_sentences_list)
@@ -378,13 +384,12 @@ def generate_sentences(partial_sentence,full_sentence, model, model_BERT, tokeni
     input_ids = torch.tensor([tokenizer.encode(partial_sentence)])
     maximum_length = len(partial_sentence.split())+80
 
-    # Actiavte top_k sampling and top_p sampling with only from 90% most likely words
     sample_outputs = model.generate(
         input_ids, 
         do_sample=True, 
         max_length=maximum_length, 
-        top_p=0.90, # 0.85 
-        top_k=50,   #0.30
+        top_p=0.90,
+        top_k=50,
         repetition_penalty  = 10.0,
         num_return_sequences=10
     )
@@ -396,16 +401,7 @@ def generate_sentences(partial_sentence,full_sentence, model, model_BERT, tokeni
         
     top_3_sentences = sort_by_similarity(full_sentence,generated_sentences, model_BERT)
     
-    return top_3_sentences
-    
-def get_flattened(t):
-    sent_str_final = None
-    if t is not None:
-        sent_str = [" ".join(x.leaves()) for x in list(t)]
-        sent_str_final = [" ".join(sent_str)]
-        sent_str_final = sent_str_final[0]
-    return sent_str_final
-    
+    return top_3_sentences  
 
 def get_termination_portion(main_string,sub_string):
     combined_sub_string = sub_string.replace(" ","")
@@ -419,18 +415,6 @@ def get_termination_portion(main_string,sub_string):
             return " ".join(main_string_list[:i])
                      
     return None
-    
-def get_right_most_VP_or_NP(parse_tree,last_NP = None,last_VP = None):
-    if len(parse_tree.leaves()) == 1:
-        return get_flattened(last_NP),get_flattened(last_VP)
-    last_subtree = parse_tree[-1]
-    if last_subtree.label() == "NP":
-        last_NP = last_subtree
-    elif last_subtree.label() == "VP":
-        last_VP = last_subtree
-    
-    return get_right_most_VP_or_NP(last_subtree,last_NP,last_VP)
-
 
 def get_sentence_completions(filter_quotes_and_questions):
     sentence_completion_dict = {}
@@ -457,48 +441,37 @@ def get_sentence_completions(filter_quotes_and_questions):
             sentence_completion_dict[sentence]=longest_phrase
     return sentence_completion_dict
   
-  ################################################
-  # Driver Function 
-  ################################################
+################################################
+# Driver Function 
+################################################
 def true_false_generation(text):
-    tokenizerGPT2 = GPT2Tokenizer.from_pretrained("gpt2")
+    tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     model_BERT = SentenceTransformer('bert-base-nli-mean-tokens')
-    modelGPT2 = GPT2LMHeadModel.from_pretrained("gpt2",pad_token_id=tokenizerGPT2.eos_token_id)
+    model = GPT2LMHeadModel.from_pretrained("gpt2",pad_token_id=tokenizer.eos_token_id)
+    text = text.replace('\n','')
+    text = text.replace('\t',' ')
 
-    # print(text)
-    cand_sents = get_candidate_sents(text)
-    # print(cand_sents)
-    filter_quotes_and_questions = preprocess(cand_sents)
-    # print(filter_quotes_and_questions)
-    #for each_sentence in filter_quotes_and_questions:
-    #    print (each_sentence)
-    #    print ("\n")
-    sent_completion_dict = get_sentence_completions(filter_quotes_and_questions)
-    # print(sent_completion_dict)
+    cand_sents = generate_candidate_sents(text)
+    cand_sents = preprocess_cand_sents(cand_sents)
+    sentence_completion_dict = get_sentence_completions(cand_sents)
 
-    index = 1
-    # choice_list = ["a)","b)","c)","d)","e)","f)"]
     res_complete = []
-    for key_sentence in sent_completion_dict:
+    for key_sentence in sentence_completion_dict:
         res_individual = []
-        partial_sentences = sent_completion_dict[key_sentence]
+        partial_sentences = sentence_completion_dict[key_sentence]
         false_sentences =[]
-        #print_string = "**%s) True Sentence (from the story) :**"%(str(index))
-        #print(print_string)
-        #print ("  ",key_sentence)
+
         res_individual.append(str(key_sentence))
         for partial_sent in partial_sentences:
-            false_sents = generate_sentences(partial_sent,key_sentence, modelGPT2, model_BERT, tokenizerGPT2)
+            false_sents = generate_sentences(partial_sent,key_sentence, model, model_BERT, tokenizer)
             false_sentences.extend(false_sents)
         res_individual.extend(false_sents)
-        res_complete.append(res_individual)
-    #    print("  **False Sentences (GPT-2 Generated)**")
-    #    for ind,false_sent in enumerate(false_sentences):
-    #        print_string_choices = "**%s** %s"%(choice_list[ind],false_sent)
-    #        print(print_string_choices)
-        index = index+1  
-    #   print ("\n\n")
+        res_complete.append(res_individual) 
+
     return res_complete
+
+
+############### GET QUESTIONS ###############
 
 def get_questions(textList):
     summ = ""
